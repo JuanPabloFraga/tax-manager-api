@@ -1,0 +1,36 @@
+services:
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: taxmanager-db
+    environment:
+      POSTGRES_DB: taxmanager
+      POSTGRES_USER: taxmanager
+      POSTGRES_PASSWORD: taxmanager
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taxmanager"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: taxmanager-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taxmanager
+      SPRING_DATASOURCE_USERNAME: taxmanager
+      SPRING_DATASOURCE_PASSWORD: taxmanager
+      JWT_SECRET: cambiar-esta-clave-en-produccion-debe-tener-minimo-256-bits!!
+      SPRING_PROFILES_ACTIVE: prod
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
