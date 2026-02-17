@@ -161,6 +161,27 @@ tax-manager-api/
 | [CONTRIBUTING.md](CONTRIBUTING.md)                    | Convenciones de código, commits, testing     |
 | [CHANGELOG.md](CHANGELOG.md)                         | Historial de cambios                         |
 
+## Tests
+
+**83 unit tests** — todos pasando ✅
+
+| Módulo    | Tests | Cobertura                                  |
+|-----------|-------|--------------------------------------------|
+| shared    | 26    | CuitValidator (21 parameterized), JwtProvider (5) |
+| taxpayer  | 19    | Entidad (13), CreateService (2), GetService (4) |
+| voucher   | 16    | Entidad (9), CreateService (2), GetService (5) |
+| vatbook   | 3     | GetVatBookService (3)                      |
+| auth      | 18    | User entity (12), RegisterService (3), LoginService (3) |
+| app       | 1     | ApplicationContext startup                 |
+
+```bash
+# Ejecutar todos los tests
+./mvnw test
+
+# Ejecutar tests de un módulo específico
+./mvnw test -Dtest="**/taxpayer/**"
+```
+
 ## Licencia
 
 Este proyecto está bajo la licencia especificada en [LICENSE](LICENSE).

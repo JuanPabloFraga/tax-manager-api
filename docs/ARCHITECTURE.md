@@ -199,11 +199,10 @@ src/main/java/com/{group}/taxmanagerapi/
     │   └── GlobalExceptionHandler.java    ← @RestControllerAdvice
     ├── security/
     │   ├── SecurityConfig.java
-    │   ├── JwtTokenProvider.java
+    │   ├── JwtProvider.java
     │   ├── JwtAuthenticationFilter.java
-    │   └── exception/
-    │       ├── CustomAuthenticationEntryPoint.java
-    │       └── CustomAccessDeniedHandler.java
+    │   ├── CustomAuthenticationEntryPoint.java
+    │   └── CustomAccessDeniedHandler.java
     └── fiscal/
         └── CuitValidator.java
 ```
@@ -478,7 +477,7 @@ El paquete `shared/` contiene código transversal que usan todos los bounded con
 |----------------------|--------------------------------|------------------------------------------|
 | `shared/config`      | `OpenApiConfig`                | Configuración de Swagger/SpringDoc       |
 | `shared/exception`   | Jerarquía de excepciones + handler | DomainException, GlobalExceptionHandler |
-| `shared/security`    | JWT, filtro, config de seguridad | SecurityConfig, JwtTokenProvider        |
+| `shared/security`    | JWT, filtro, config de seguridad | SecurityConfig, JwtProvider, JwtAuthenticationFilter |
 | `shared/fiscal`      | Validadores fiscales argentinos | CuitValidator (módulo 11)               |
 
 > `shared/` **no es un bounded context**. No tiene domain/application/infrastructure.
@@ -524,22 +523,22 @@ graph LR
 sequenceDiagram
     participant C as Cliente
     participant F as JwtAuthenticationFilter
-    participant JP as JwtTokenProvider
+    participant JP as JwtProvider
     participant SC as SecurityContext
     participant CT as Controller
 
     C->>F: Request + Authorization: Bearer {token}
     F->>JP: validateToken(token)
     JP-->>F: Claims (userId, email, role)
-    F->>SC: setAuthentication(userDetails)
+    F->>SC: setAuthentication(userId, ROLE_{role})
     F->>CT: Request (autenticado)
     CT-->>C: Response
 ```
 
 | Componente                        | Responsabilidad                                    |
 |-----------------------------------|----------------------------------------------------|
-| `SecurityConfig`                  | Configura rutas públicas/protegidas, CORS, CSRF    |
-| `JwtTokenProvider`                | Genera y valida tokens JWT (access + refresh)      |
+| `SecurityConfig`                  | Configura rutas públicas/protegidas, CSRF, filtro JWT |
+| `JwtProvider`                     | Genera y valida tokens JWT (HS256, claims: sub/email/role) |
 | `JwtAuthenticationFilter`         | Intercepta cada request, extrae y valida el JWT    |
 | `CustomAuthenticationEntryPoint`  | Responde 401 en formato ProblemDetail              |
 | `CustomAccessDeniedHandler`       | Responde 403 en formato ProblemDetail              |
