@@ -37,9 +37,6 @@ jobs:
           cache: maven
 
       - name: Build & Test
-        run: ./mvnw verify -B
+        run: ./mvnw verify -B -Dspring.profiles.active=test
         env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/taxmanager_test
-          SPRING_DATASOURCE_USERNAME: test
-          SPRING_DATASOURCE_PASSWORD: test
           JWT_SECRET: ci-test-secret-key-min-256-bits-para-github-actions-pipeline!!
